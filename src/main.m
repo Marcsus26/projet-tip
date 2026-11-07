@@ -10,7 +10,7 @@ rng(0) % Reproducible train/validation split and weight initialization.
 % Set to true to predict the test set and write the submission JSON.
 generateSubmission = true;
 
-inputSize = [64 64 3];  % Every image is resized to this size.
+inputSize = [256 256 3];  % Every image is resized to this size.
 validationFraction = 0.2;        % Fraction of each class held out for validation.
 
 % Paths are resolved relative to this script, so it runs from any folder.
@@ -51,38 +51,40 @@ augValidation = augmentedImageDatastore(inputSize, imdsVal, ...
 %% Define the network
 % Global average pooling before the classifier keeps the number of
 % parameters independent of the input resolution (frugality score).
-layers = [
-    imageInputLayer(inputSize)
+% layers = [
+%     imageInputLayer(inputSize)
+% 
+%     convolution2dLayer(3, 64, Padding="same", Stride=2)
+%     batchNormalizationLayer()
+%     reluLayer()
+% 
+%     convolution2dLayer(3, 64, Padding="same")
+%     batchNormalizationLayer()
+%     reluLayer()
+% 
+%     maxPooling2dLayer(2, Stride=2)
+% 
+%     convolution2dLayer(3, 128, Padding="same")
+%     batchNormalizationLayer()
+%     reluLayer()
+% 
+%     convolution2dLayer(3, 128, Padding="same")
+%     batchNormalizationLayer()
+%     reluLayer()
+% 
+%     maxPooling2dLayer(2, Stride=2)
+% 
+%     fullyConnectedLayer(numClasses)
+%     softmaxLayer()
+%     ];
+% 
 
-    convolution2dLayer(3, 64, Padding="same", Stride=2)
-    batchNormalizationLayer()
-    reluLayer()
-
-    convolution2dLayer(3, 64, Padding="same")
-    batchNormalizationLayer()
-    reluLayer()
-
-    maxPooling2dLayer(2, Stride=2)
-
-    convolution2dLayer(3, 128, Padding="same")
-    batchNormalizationLayer()
-    reluLayer()
-
-    convolution2dLayer(3, 128, Padding="same")
-    batchNormalizationLayer()
-    reluLayer()
-
-    maxPooling2dLayer(2, Stride=2)
-
-    fullyConnectedLayer(numClasses)
-    softmaxLayer()
-    ];
-
-analyzeNetwork(layers)
+PretrainedNet = imagePretrainedNetwork("shufflenet", NumClasses=numClasses);
+analyzeNetwork(PretrainedNet)
 
 %% Hyperparameters
 miniBatchSize = 32;
-maxEpochs = 20;
+maxEpochs = 5;
 initialLearnRate = 1e-3;
 sgdmMomentum = 0.9;
 L2Regularization = 5e-4;
@@ -109,7 +111,7 @@ options = trainingOptions("adam", ...
     Metrics="accuracy");
 
 
-net = trainnet(augTrain, layers, "crossentropy", options);
+net = trainnet(augTrain, PretrainedNet, "crossentropy", options);
 
 %% Evaluate the final network and display the confusion matrix
 % Train-set accuracy is measured on the resized images without augmentation.
