@@ -8,9 +8,9 @@ rng(0) % Reproducible train/validation split and weight initialization.
 
 %% Configuration
 % Set to true to predict the test set and write the submission JSON.
-generateSubmission = false;
+generateSubmission = true;
 
-inputSize = [224 224 3];  % Every image is resized to this size.
+inputSize = [64 64 3];  % Every image is resized to this size.
 validationFraction = 0.2;        % Fraction of each class held out for validation.
 
 % Paths are resolved relative to this script, so it runs from any folder.
@@ -74,16 +74,6 @@ layers = [
 
     maxPooling2dLayer(2, Stride=2)
 
-    convolution2dLayer(3, 256, Padding="same")
-    batchNormalizationLayer()
-    reluLayer()
-
-    convolution2dLayer(3, 256, Padding="same")
-    batchNormalizationLayer()
-    reluLayer()
-
-    maxPooling2dLayer(2, Stride=2)
-
     fullyConnectedLayer(numClasses)
     softmaxLayer()
     ];
@@ -92,7 +82,7 @@ analyzeNetwork(layers)
 
 %% Hyperparameters
 miniBatchSize = 32;
-maxEpochs = 30;
+maxEpochs = 20;
 initialLearnRate = 1e-3;
 sgdmMomentum = 0.9;
 L2Regularization = 5e-4;
@@ -103,8 +93,7 @@ learnRateDropFactor = 0.1;
 % Validate roughly once per epoch.
 validationFrequency = floor(numel(imdsTrain.Files) / miniBatchSize);
 
-options = trainingOptions("sgdm", ...
-    Momentum=sgdmMomentum,...
+options = trainingOptions("adam", ...
     InitialLearnRate=initialLearnRate, ...
     L2Regularization=L2Regularization, ...
     LearnRateSchedule="piecewise", ...
