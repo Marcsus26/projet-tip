@@ -4,13 +4,12 @@
 
 clearvars
 close all
-rng(0) % Reproducible train/validation split and weight initialization.
 
 %% Configuration
 % Set to true to predict the test set and write the submission JSON.
 generateSubmission = true;
 
-inputSize = [256 256 3];  % Every image is resized to this size.
+inputSize = [224 224 3];  % Every image is resized to this size.
 validationFraction = 0.2;        % Fraction of each class held out for validation.
 
 % Paths are resolved relative to this script, so it runs from any folder.
@@ -85,10 +84,10 @@ analyzeNetwork(PretrainedNet)
 %% Hyperparameters
 miniBatchSize = 32;
 maxEpochs = 5;
-initialLearnRate = 1e-3;
+initialLearnRate = 1e-4;
 sgdmMomentum = 0.9;
 L2Regularization = 5e-4;
-learnRateDropPeriod = 18;
+learnRateDropPeriod = 3;
 learnRateDropFactor = 0.1;
 
 %% Train the network
