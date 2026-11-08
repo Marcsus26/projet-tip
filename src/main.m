@@ -9,7 +9,7 @@ close all
 % Set to true to predict the test set and write the submission JSON.
 generateSubmission = true;
 
-inputSize = [224 224 3];  % Every image is resized to this size.
+inputSize = [512 512 3];  % Every image is resized to this size.
 validationFraction = 0.2;        % Fraction of each class held out for validation.
 
 % Paths are resolved relative to this script, so it runs from any folder.
@@ -78,16 +78,16 @@ augValidation = augmentedImageDatastore(inputSize, imdsVal, ...
 %     ];
 % 
 
-PretrainedNet = imagePretrainedNetwork("shufflenet", NumClasses=numClasses);
+PretrainedNet = imagePretrainedNetwork("mobilenetv2", NumClasses=numClasses);
 analyzeNetwork(PretrainedNet)
 
 %% Hyperparameters
 miniBatchSize = 32;
 maxEpochs = 5;
-initialLearnRate = 1e-4;
+initialLearnRate = 1e-3;
 sgdmMomentum = 0.9;
 L2Regularization = 5e-4;
-learnRateDropPeriod = 3;
+learnRateDropPeriod = 18;
 learnRateDropFactor = 0.1;
 
 %% Train the network
