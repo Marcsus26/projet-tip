@@ -2,7 +2,6 @@
 % confusion matrix on a validation split and, optionally, write the
 % submission JSON for the unlabeled test set.
 
-clearvars
 close all
 
 %% Configuration
@@ -10,7 +9,7 @@ close all
 generateSubmission = true;
 
 inputSize = [224 224 3];  % Every image is resized to this size.
-validationFraction = 0.2;        % Fraction of each class held out for validation.
+validationFraction = 0.1;        % Fraction of each class held out for validation.
 
 % Paths are resolved relative to this script, so it runs from any folder.
 srcDir = fileparts(mfilename("fullpath"));
@@ -78,13 +77,13 @@ augValidation = augmentedImageDatastore(inputSize, imdsVal, ...
 %     ];
 % 
 
-PretrainedNet = imagePretrainedNetwork("shufflenet", NumClasses=numClasses);
-analyzeNetwork(PretrainedNet)
+
+analyzeNetwork(net)
 
 %% Hyperparameters
 miniBatchSize = 32;
-maxEpochs = 5;
-initialLearnRate = 1e-4;
+maxEpochs = 13;
+initialLearnRate = 1e-3;
 sgdmMomentum = 0.9;
 L2Regularization = 5e-4;
 learnRateDropPeriod = 3;
